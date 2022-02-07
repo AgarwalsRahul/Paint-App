@@ -1,2 +1,2 @@
 # Paint-App
-A Basic Paint application which allows user to draw shapes and line with their fingers on the screen in different colors
+The Basic Paint application allows users to draw shapes and lines with their fingers on the screen with different colors. This project is made to learn how to draw complex objects using Canvas
