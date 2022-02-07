@@ -12,4 +12,5 @@
     <color name="blue">#0078DE</color>
     <color name="colorBackground">#FFFFFFFF</color>
     <color name="colorPaint">#FF000000</color>
+    <color name="toolColorUnselected">#747474</color>
 </resources>

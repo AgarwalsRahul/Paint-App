@@ -9,6 +9,7 @@ import android.view.*
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.PopupWindow
+import android.widget.RelativeLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import kotlin.math.abs
@@ -24,6 +25,9 @@ class MainActivity : AppCompatActivity(), PaintView.PaintController {
     private lateinit var rectangle: ImageView
     private lateinit var circle: ImageView
     private lateinit var palette: ImageView
+
+
+    private lateinit var popupWindow: PopupWindow
 
     private var selectedTool = TOOL.Pencil
 
@@ -62,7 +66,7 @@ class MainActivity : AppCompatActivity(), PaintView.PaintController {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         pencil = findViewById(R.id.pencil)
-        pencil.background = ResourcesCompat.getDrawable(resources, R.drawable.tool_background, null)
+//        pencil.background = ResourcesCompat.getDrawable(resources, R.drawable.tool_background, null)
         arrow = findViewById(R.id.arrow)
         rectangle = findViewById(R.id.rectangle)
         circle = findViewById(R.id.circle)
@@ -70,6 +74,7 @@ class MainActivity : AppCompatActivity(), PaintView.PaintController {
         linearLayout = findViewById(R.id.linearLayout)
         backgroundColor =
             ResourcesCompat.getColor(resources, R.color.colorBackground, null)
+        setToolBackground()
         drawColor = ResourcesCompat.getColor(resources, R.color.colorPaint, null)
         touchTolerance = ViewConfiguration.get(this).scaledTouchSlop
         paint = Paint().apply {
@@ -83,64 +88,111 @@ class MainActivity : AppCompatActivity(), PaintView.PaintController {
         }
 
         subscribeListener()
+        findViewById<PaintView>(R.id.draw_view).setOnClickListener {
+            if (::popupWindow.isInitialized && popupWindow.isShowing)
+                popupWindow.dismiss()
+        }
+
+
+
     }
 
+    private fun setToolBackground() {
+        clearBackground()
+        when (selectedTool) {
+            TOOL.Pencil -> {
+
+                pencil.background =
+                    ResourcesCompat.getDrawable(resources, R.drawable.tool_background, null)
+                pencil.setColorFilter(Color.BLACK)
+            }
+            TOOL.Arrow -> {
+
+                arrow.background =
+                    ResourcesCompat.getDrawable(resources, R.drawable.tool_background, null)
+                arrow.setColorFilter(Color.BLACK)
+            }
+            TOOL.Rectangle -> {
+
+                rectangle.background =
+                    ResourcesCompat.getDrawable(resources, R.drawable.tool_background, null)
+                rectangle.setColorFilter(Color.BLACK)
+            }
+            TOOL.Circle -> {
+                circle.background =
+                    ResourcesCompat.getDrawable(resources, R.drawable.tool_background, null)
+                circle.setColorFilter(Color.BLACK)
+            }
+            else -> {}
+        }
+    }
 
     private fun subscribeListener() {
         pencil.setOnClickListener {
-            clearBackground()
-            it.background = ResourcesCompat.getDrawable(resources, R.drawable.tool_background, null)
+
             selectedTool = TOOL.Pencil
+            setToolBackground()
         }
         arrow.setOnClickListener {
-            clearBackground()
-            it.background = ResourcesCompat.getDrawable(resources, R.drawable.tool_background, null)
+
             selectedTool = TOOL.Arrow
+            setToolBackground()
         }
         rectangle.setOnClickListener {
-            clearBackground()
-            it.background = ResourcesCompat.getDrawable(resources, R.drawable.tool_background, null)
+
             selectedTool = TOOL.Rectangle
+            setToolBackground()
         }
         circle.setOnClickListener {
-            clearBackground()
-            it.background = ResourcesCompat.getDrawable(resources, R.drawable.tool_background, null)
+
             selectedTool = TOOL.Circle
+            setToolBackground()
         }
         palette.setOnClickListener {
             clearBackground()
-            it.background = ResourcesCompat.getDrawable(resources, R.drawable.tool_background, null)
-            val layoutInflater =
-                this@MainActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-            val customView: View = layoutInflater.inflate(R.layout.color_layout, null)
-            val popupWindow =
-                PopupWindow(
-                    customView,
-                    ActionBar.LayoutParams.WRAP_CONTENT,
-                    ActionBar.LayoutParams.WRAP_CONTENT
-                )
-
-            //display the popup window
-
-
-            popupWindow.showAsDropDown(linearLayout, linearLayout.width / 2, 15)
-
-            customView.findViewById<View>(R.id.redColor)?.setOnClickListener {
-                drawColor = ResourcesCompat.getColor(resources, R.color.red, null)
+            if (::popupWindow.isInitialized && popupWindow.isShowing) {
                 popupWindow.dismiss()
+            } else {
+
+                it.background =
+                    ResourcesCompat.getDrawable(resources, R.drawable.tool_background, null)
+                palette.setColorFilter(Color.BLACK)
+                val layoutInflater =
+                    this@MainActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                val customView: View = layoutInflater.inflate(R.layout.color_layout, null)
+                popupWindow =
+                    PopupWindow(
+                        customView,
+                        ActionBar.LayoutParams.WRAP_CONTENT,
+                        ActionBar.LayoutParams.WRAP_CONTENT
+                    )
+                //display the popup window
+                Log.d("MainActivity",palette.height.toString())
+
+                popupWindow.showAsDropDown(palette, -palette.width*4,
+                    (palette.height/2).toInt(),Gravity.END)
+
+                customView.findViewById<View>(R.id.redColor)?.setOnClickListener {
+                    drawColor = ResourcesCompat.getColor(resources, R.color.red, null)
+                    popupWindow.dismiss()
+                }
+                customView.findViewById<View>(R.id.blueColor)?.setOnClickListener {
+                    drawColor = ResourcesCompat.getColor(resources, R.color.blue, null)
+                    popupWindow.dismiss()
+                }
+                customView.findViewById<View>(R.id.greenColor)?.setOnClickListener {
+                    drawColor = ResourcesCompat.getColor(resources, R.color.green, null)
+                    popupWindow.dismiss()
+                }
+                customView.findViewById<View>(R.id.blackColor)?.setOnClickListener {
+                    drawColor = ResourcesCompat.getColor(resources, R.color.black, null)
+                    popupWindow.dismiss()
+                }
+                popupWindow.setOnDismissListener {
+                    setToolBackground()
+                }
             }
-            customView.findViewById<View>(R.id.blueColor)?.setOnClickListener {
-                drawColor = ResourcesCompat.getColor(resources, R.color.blue, null)
-                popupWindow.dismiss()
-            }
-            customView.findViewById<View>(R.id.greenColor)?.setOnClickListener {
-                drawColor = ResourcesCompat.getColor(resources, R.color.green, null)
-                popupWindow.dismiss()
-            }
-            customView.findViewById<View>(R.id.blackColor)?.setOnClickListener {
-                drawColor = ResourcesCompat.getColor(resources, R.color.black, null)
-                popupWindow.dismiss()
-            }
+
 
         }
 
@@ -148,11 +200,19 @@ class MainActivity : AppCompatActivity(), PaintView.PaintController {
 
 
     private fun clearBackground() {
+        if(::popupWindow.isInitialized && popupWindow.isShowing){
+            popupWindow.dismiss()
+        }
         pencil.background = null
+        pencil.setColorFilter(ResourcesCompat.getColor(resources,R.color.toolColorUnselected,null))
         arrow.background = null
+        arrow.setColorFilter(ResourcesCompat.getColor(resources,R.color.toolColorUnselected,null))
         rectangle.background = null
+        rectangle.setColorFilter(ResourcesCompat.getColor(resources,R.color.toolColorUnselected,null))
         circle.background = null
+        circle.setColorFilter(ResourcesCompat.getColor(resources,R.color.toolColorUnselected,null))
         palette.background = null
+        palette.setColorFilter(ResourcesCompat.getColor(resources,R.color.toolColorUnselected,null))
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -170,7 +230,13 @@ class MainActivity : AppCompatActivity(), PaintView.PaintController {
         when (selectedTool) {
 
             TOOL.Arrow -> {
-                drawArrow(canvas, currentX, currentY, motionTouchEventX, motionTouchEventY, paint.apply { color = drawColor })
+                drawArrow(
+                    canvas,
+                    currentX,
+                    currentY,
+                    motionTouchEventX,
+                    motionTouchEventY,
+                    paint.apply { color = drawColor })
             }
             TOOL.Rectangle -> {
 
@@ -221,7 +287,7 @@ class MainActivity : AppCompatActivity(), PaintView.PaintController {
             rectPoints.add(Pair(rect, drawColor))
         if (::arrowPath.isInitialized && selectedTool == TOOL.Arrow)
             arrowPaths.add(Pair(arrowPath, drawColor))
-        if (selectedTool == TOOL.Pencil){
+        if (selectedTool == TOOL.Pencil) {
             path.reset()
         }
 
@@ -279,7 +345,6 @@ class MainActivity : AppCompatActivity(), PaintView.PaintController {
     }
 
 
-
     override fun setMotionTouchEvent(event: MotionEvent) {
         motionTouchEventX = event.x
         motionTouchEventY = event.y
@@ -298,5 +363,11 @@ class MainActivity : AppCompatActivity(), PaintView.PaintController {
         canvas.drawPath(circlePath, paint.apply { color = drawColor })
     }
 
+    override fun onPause() {
+        if(::popupWindow.isInitialized && popupWindow.isShowing){
+            popupWindow.dismiss()
+        }
+        super.onPause()
+    }
 
 }
