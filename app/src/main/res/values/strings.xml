@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Paint</string>
+    <string name="canvasContentDescription">Paint is a simple line and shape drawing app with different stroke colors</string>
+</resources>
