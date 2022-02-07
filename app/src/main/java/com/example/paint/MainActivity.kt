@@ -170,7 +170,7 @@ class MainActivity : AppCompatActivity(), PaintView.PaintController {
         when (selectedTool) {
 
             TOOL.Arrow -> {
-                drawArrow(canvas, currentX, currentY, motionTouchEventX, motionTouchEventY, paint)
+                drawArrow(canvas, currentX, currentY, motionTouchEventX, motionTouchEventY, paint.apply { color = drawColor })
             }
             TOOL.Rectangle -> {
 
@@ -276,7 +276,6 @@ class MainActivity : AppCompatActivity(), PaintView.PaintController {
         extraBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
         extraCanvas = Canvas(extraBitmap)
         extraCanvas.drawColor(backgroundColor)
-
     }
 
 
@@ -296,7 +295,7 @@ class MainActivity : AppCompatActivity(), PaintView.PaintController {
             motionTouchEventY,
             Path.Direction.CW
         )
-        canvas.drawPath(circlePath, paint)
+        canvas.drawPath(circlePath, paint.apply { color = drawColor })
     }
 
 
